@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Launcher</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:#eee;
+    background:radial-gradient(circle at top,#302047,#111016 60%)
+}
+
+button,input{
+    font:inherit
+}
+
+button{
+    cursor:pointer;
+    border:1px solid #806541;
+    border-radius:7px;
+    padding:10px 16px;
+    color:#fff;
+    background:#382c43;
+    transition:.15s
+}
+
+button:hover{
+    background:#574269;
+    transform:translateY(-1px)
+}
+
+button.primary{
+    background:#765323;
+    border-color:#d8b86d
+}
+
+input{
+    color:#eee;
+    background:#151219;
+    border:1px solid #66556e;
+    border-radius:7px;
+    padding:11px 14px
+}
+
+#app{
+    min-height:100vh
+}
+
+header{
+    padding:35px 25px 25px;
+    text-align:center;
+    border-bottom:1px solid #49394f;
+    background:#18141dcc
+}
+
+header h1{
+    margin:0;
+    color:#e8bf67;
+    font-size:48px;
+    text-shadow:3px 3px #000
+}
+
+header p{
+    margin:10px 0 25px;
+    color:#bdb1c4
+}
+
+.header-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px
+}
+
+.header-buttons button.active{
+    background:#765323;
+    border-color:#d8b86d
+}
+
+/* ACCOUNT BUTTON */
+
+.account-button{
+    display:flex;
+    align-items:center;
+    gap:8px
+}
+
+.account-status-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#777;
+    display:inline-block
+}
+
+.account-status-dot.online{
+    background:#39d353;
+    box-shadow:0 0 8px #39d353
+}
+
+.account-status-dot.offline{
+    background:#e55353
+}
+
+/* ACCOUNT MODAL */
+
+.account-modal-content{
+    width:min(500px,100%);
+    text-align:center
+}
+
+.account-avatar{
+    width:75px;
+    height:75px;
+    margin:0 auto 15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#765323;
+    border:2px solid #d8b86d;
+    border-radius:50%;
+    font-size:32px;
+    font-weight:bold;
+    color:#fff
+}
+
+.account-username{
+    color:#e8bf67;
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:8px
+}
+
+.account-online{
+    color:#39d353;
+    font-size:14px;
+    margin-bottom:20px
+}
+
+.account-actions{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px
+}
+
+.account-actions button{
+    flex:1;
+    min-width:140px
+}
+
+.account-loading{
+    color:#aaa;
+    padding:20px
+}
+
+/* REST OF LAUNCHER */
+
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    max-width:1100px;
+    margin:25px auto 0;
+    padding:0 20px
+}
+
+.search{
+    flex:1;
+    min-width:220px
+}
+
+main{
+    max-width:1100px;
+    margin:auto;
+    padding:25px 20px 60px
+}
+
+.category{
+    margin-top:35px
+}
+
+.category h2{
+    color:#e8bf67;
+    border-bottom:1px solid #49394f;
+    padding-bottom:10px
+}
+
+.game-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:18px
+}
+
+.game-card{
+    display:flex;
+    flex-direction:column;
+    background:#211b28;
+    border:1px solid #5c4963;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 8px 25px #0006;
+    transition:.2s
+}
+
+.game-card:hover{
+    transform:translateY(-3px);
+    border-color:#a27b39
+}
+
+.game-icon{
+    font-size:55px;
+    margin-bottom:10px
+}
+
+.game-card h3{
+    margin:0 0 8px;
+    color:#e8bf67;
+    font-size:24px
+}
+
+.game-description{
+    flex:1;
+    color:#c5bbc9;
+    line-height:1.5
+}
+
+.game-author{
+    color:#9d91a4;
+    font-size:14px;
+    margin:12px 0
+}
+
+.game-author strong{
+    color:#d8b878
+}
+
+.game-actions{
+    display:flex;
+    gap:8px;
+    margin-top:10px
+}
+
+.game-actions button{
+    flex:1
+}
+
+.favorite-button{
+    flex:0 0 auto!important;
+    min-width:52px;
+    padding:10px 12px;
+    font-size:20px
+}
+
+.favorite-button.favorited{
+    background:#6b2929;
+    border-color:#d66
+}
+
+.empty{
+    text-align:center;
+    color:#8f8495;
+    padding:40px 20px;
+    background:#18141d;
+    border:1px dashed #49394f;
+    border-radius:10px
+}
+
+#welcome{
+    max-width:700px;
+    margin:45px auto;
+    padding:35px;
+    text-align:center;
+    background:#211b28;
+    border:1px solid #5c4963;
+    border-radius:12px;
+    box-shadow:0 10px 35px #0008
+}
+
+#welcome h2{
+    color:#e8bf67
+}
+
+#welcome p{
+    color:#c5bbc9;
+    line-height:1.6
+}
+
+.instructions{
+    text-align:left;
+    margin-top:25px;
+    padding:18px;
+    background:#18141d;
+    border-radius:8px
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:#000b;
+    z-index:100
+}
+
+.modal.active{
+    display:flex
+}
+
+.modal-content{
+    width:min(650px,100%);
+    background:#211b28;
+    border:1px solid #71577a;
+    border-radius:12px;
+    padding:25px;
+    box-shadow:0 15px 50px #000
+}
+
+.modal-content h2{
+    margin-top:0;
+    color:#e8bf67
+}
+
+.modal-content p{
+    color:#c5bbc9;
+    line-height:1.5
+}
+
+.modal-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:20px
+}
+
+#fileInput{
+    display:none
+}
+
+.notification{
+    position:fixed;
+    bottom:25px;
+    left:50%;
+    transform:translateX(-50%);
+    display:none;
+    padding:13px 22px;
+    background:#31253a;
+    border:1px solid #b28a43;
+    border-radius:8px;
+    color:#fff;
+    z-index:200;
+    box-shadow:0 5px 20px #0008
+}
+
+footer{
+    padding:25px;
+    text-align:center;
+    color:#706778;
+    font-size:13px
+}
+
+@media(max-width:600px){
+
+    header h1{
+        font-size:36px
+    }
+
+    .game-grid{
+        grid-template-columns:1fr
+    }
+
+    .account-actions{
+        flex-direction:column
+    }
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<header>
+
+<h1>Core Games</h1>
+
+<p>Your collection of HTML games.</p>
+
+<div class="header-buttons">
+
+<button
+id="allGamesButton"
+class="primary"
+onclick="showAllGames()"
+
+>
+
+🎮 All Games </button>
+
+<button
+id="favoritesButton"
+onclick="showFavorites()"
+
+>
+
+❤️ Favorites </button>
+
+<button
+id="accountButton"
+class="account-button"
+onclick="openAccount()"
+
+>
+
+<span
+id="accountStatusDot"
+class="account-status-dot"
+
+> </span>
+
+<span id="accountButtonText">
+👤 Core Account
+</span>
+</button>
+
+<button onclick="openInstructions()">
+❓ How to Add Games
+</button>
+
+</div>
+
+</header>
+
+<div
+id="controls"
+class="controls"
+style="display:none"
+>
+
+<input
+id="searchInput"
+class="search"
+type="text"
+placeholder="🔍 Search games..."
+oninput="renderGames()"
+
+>
+
+<button onclick="clearGames()">
+Clear Library
+</button>
+
+</div>
+
+<main>
+
+<div id="welcome">
+
+<h2>
+Welcome to the Game Launcher!
+</h2>
+
+<p>
+Your <strong>games/games.json</strong>
+manifest will load automatically.
+</p>
+
+<div class="instructions">
+
+<strong>
+Your folder should look like:
+</strong>
+
+<pre>Game Launcher/
+├── Game Launcher.html
+└── games/
+    ├── games.json
+    ├── Bad Apples+.html
+    └── Dungeons And Dragons.html</pre>
+
+</div>
+
+</div>
+
+<div id="gameLibrary"></div>
+
+</main>
+
+<footer>
+Game Launcher • HTML Game Platform
+</footer>
+
+</div>
+
+<!-- ACCOUNT MODAL -->
+
+<div
+id="accountModal"
+class="modal"
+>
+
+<div
+class="modal-content account-modal-content"
+>
+
+<h2>
+👤 Core Games Account
+</h2>
+
+<div
+id="accountModalBody"
+>
+
+<div class="account-loading">
+Checking account...
+</div>
+
+</div>
+
+<div class="modal-buttons">
+
+<button onclick="closeAccount()">
+Close
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- INSTRUCTIONS MODAL -->
+
+<div
+id="instructionsModal"
+class="modal"
+>
+
+<div class="modal-content">
+
+<h2>
+❓ Adding Games
+</h2>
+
+<p>
+Anyone can add their own HTML games
+to the launcher.
+</p>
+
+<h3>
+1. Put your game in the games folder
+</h3>
+
+<pre>games/
+├── games.json
+├── Bad Apples+.html
+├── Dungeons And Dragons.html
+└── My Game.html</pre>
+
+<h3>
+2. Add your game to games.json
+</h3>
+
+<pre>{
+    "name": "My Game",
+    "file": "My Game.html",
+    "description": "A game I made.",
+    "icon": "🎮",
+    "category": "Community",
+    "author": "Your Name"
+}</pre>
+
+<h3>
+3. Load the manifest
+</h3>
+
+<p>
+Put <strong>games.json</strong> inside the
+<strong>games</strong> folder, then start
+the launcher through your local server.
+</p>
+
+<p>
+The launcher will automatically display
+your game.
+</p>
+
+<div class="modal-buttons">
+
+<button onclick="closeInstructions()">
+Close
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div
+id="notification"
+class="notification"
+></div>
+
+<script>
+
+let games=[];
+
+let manifestFile=null;
+
+let currentView="all";
+
+const FAVORITES_STORAGE_KEY=
+"coreGamesFavorites";
+
+
+/* =========================================================
+ACCOUNT STATE
+========================================================= */
+
+let currentAccount=null;
+
+
+/* =========================================================
+ACCOUNT SESSION
+========================================================= */
+
+async function checkAccountSession(){
+
+    const dot=
+        document.getElementById(
+            "accountStatusDot"
+        );
+
+    const buttonText=
+        document.getElementById(
+            "accountButtonText"
+        );
+
+
+    try{
+
+        const response=
+            await fetch(
+                "/api/me",
+                {
+                    credentials:"include"
+                }
+            );
+
+
+        if(!response.ok){
+
+            setLoggedOut();
+
+            return;
+
+        }
+
+
+        const data=
+            await response.json();
+
+
+        if(
+            data.success &&
+            data.loggedIn
+        ){
+
+            currentAccount={
+                username:data.username
+            };
+
+
+            setLoggedIn(
+                data.username
+            );
+
+        }else{
+
+            setLoggedOut();
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "Could not check Core Games account:",
+            error
+        );
+
+        setLoggedOut();
+
+    }
+
+}
+
+
+/* =========================================================
+SET ACCOUNT UI
+========================================================= */
+
+function setLoggedIn(username){
+
+    currentAccount={
+        username:username
+    };
+
+
+    const dot=
+        document.getElementById(
+            "accountStatusDot"
+        );
+
+
+    const buttonText=
+        document.getElementById(
+            "accountButtonText"
+        );
+
+
+    dot.className=
+        "account-status-dot online";
+
+
+    buttonText.innerText=
+        "👤 " +
+        username;
+
+}
+
+
+function setLoggedOut(){
+
+    currentAccount=
+        null;
+
+
+    const dot=
+        document.getElementById(
+            "accountStatusDot"
+        );
+
+
+    const buttonText=
+        document.getElementById(
+            "accountButtonText"
+        );
+
+
+    dot.className=
+        "account-status-dot offline";
+
+
+    buttonText.innerText=
+        "👤 Core Account";
+
+}
+
+
+/* =========================================================
+OPEN ACCOUNT
+========================================================= */
+
+function openAccount(){
+
+    const modal=
+        document.getElementById(
+            "accountModal"
+        );
+
+
+    const body=
+        document.getElementById(
+            "accountModalBody"
+        );
+
+
+    modal.classList.add(
+        "active"
+    );
+
+
+    if(currentAccount){
+
+        body.innerHTML=`
+
+        <div class="account-avatar">
+
+        ${escapeHTML(
+            currentAccount.username
+                .charAt(0)
+                .toUpperCase()
+        )}
+
+        </div>
+
+        <div class="account-username">
+
+        ${escapeHTML(
+            currentAccount.username
+        )}
+
+        </div>
+
+        <div class="account-online">
+
+        🟢 Logged in to Core Games
+
+        </div>
+
+        <div class="account-actions">
+
+        <button
+        class="primary"
+        onclick="openFullAccount()"
+        >
+        👥 Open Account
+        </button>
+
+        <button
+        onclick="logoutAccount()"
+        >
+        🚪 Log Out
+        </button>
+
+        </div>
+
+        `;
+
+    }else{
+
+        body.innerHTML=`
+
+        <div class="account-avatar">
+        ?
+        </div>
+
+        <p>
+        You are not currently logged in
+        to a Core Games account.
+        </p>
+
+        <div class="account-actions">
+
+        <button
+        class="primary"
+        onclick="openFullAccount()"
+        >
+        🔐 Log In / Register
+        </button>
+
+        </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+OPEN FULL ACCOUNT SYSTEM
+========================================================= */
+
+function openFullAccount(){
+
+    /*
+    Change this URL if your Core Games
+    Accounts page is hosted somewhere else.
+    */
+
+    window.open(
+        "/",
+        "_blank"
+    );
+
+}
+
+
+/* =========================================================
+LOGOUT ACCOUNT
+========================================================= */
+
+async function logoutAccount(){
+
+    try{
+
+        const response=
+            await fetch(
+                "/api/logout",
+                {
+                    method:"POST",
+                    credentials:"include"
+                }
+            );
+
+
+        const data=
+            await response.json();
+
+
+        if(data.success){
+
+            setLoggedOut();
+
+            openAccount();
+
+            notify(
+                "Logged out of Core Games Account."
+            );
+
+        }else{
+
+            notify(
+                data.message ||
+                "Unable to log out."
+            );
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "Account logout error:",
+            error
+        );
+
+        notify(
+            "Unable to connect to the account server."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+FAVORITES
+========================================================= */
+
+function getFavorites(){
+
+    try{
+
+        const saved=
+            localStorage.getItem(
+                FAVORITES_STORAGE_KEY
+            );
+
+        const parsed=
+            saved?
+            JSON.parse(saved):
+            [];
+
+
+        return Array.isArray(parsed)?
+            parsed:
+            [];
+
+    }catch(error){
+
+        console.warn(
+            "Could not load favorites:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+function saveFavorites(favorites){
+
+    try{
+
+        localStorage.setItem(
+            FAVORITES_STORAGE_KEY,
+            JSON.stringify(
+                favorites
+            )
+        );
+
+    }catch(error){
+
+        console.warn(
+            "Could not save favorites:",
+            error
+        );
+
+        notify(
+            "Could not save favorites."
+        );
+
+    }
+
+}
+
+
+function isFavorite(file){
+
+    return getFavorites()
+        .includes(file);
+
+}
+
+
+function toggleFavorite(file){
+
+    if(!file)return;
+
+
+    const favorites=
+        getFavorites();
+
+
+    const index=
+        favorites.indexOf(
+            file
+        );
+
+
+    if(index===-1){
+
+        favorites.push(file);
+
+        saveFavorites(
+            favorites
+        );
+
+        notify(
+            "❤️ Added to Favorites"
+        );
+
+    }else{
+
+        favorites.splice(
+            index,
+            1
+        );
+
+        saveFavorites(
+            favorites
+        );
+
+        notify(
+            "Removed from Favorites"
+        );
+
+    }
+
+
+    renderGames();
+
+}
+
+
+function showAllGames(){
+
+    currentView="all";
+
+    updateViewButtons();
+
+    renderGames();
+
+}
+
+
+function showFavorites(){
+
+    currentView="favorites";
+
+    updateViewButtons();
+
+    renderGames();
+
+}
+
+
+function updateViewButtons(){
+
+    document
+        .getElementById(
+            "allGamesButton"
+        )
+        .classList.toggle(
+            "active",
+            currentView==="all"
+        );
+
+
+    document
+        .getElementById(
+            "favoritesButton"
+        )
+        .classList.toggle(
+            "active",
+            currentView==="favorites"
+        );
+
+}
+
+
+/* =========================================================
+LOAD MANIFEST
+========================================================= */
+
+async function loadManifest(){
+
+    try{
+
+        const response=
+            await fetch(
+                "games/games.json",
+                {
+                    cache:"no-store"
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                `Could not find games/games.json (HTTP ${response.status}).`
+            );
+
+        }
+
+
+        const data=
+            await response.json();
+
+
+        validateManifest(
+            data
+        );
+
+
+        games=
+            data;
+
+
+        document
+            .getElementById(
+                "welcome"
+            )
+            .style.display=
+            "none";
+
+
+        document
+            .getElementById(
+                "controls"
+            )
+            .style.display=
+            "flex";
+
+
+        renderGames();
+
+
+        notify(
+            `Loaded ${games.length} game(s)!`
+        );
+
+    }catch(error){
+
+        console.error(
+            "Could not load games.json:",
+            error
+        );
+
+
+        document
+            .getElementById(
+                "welcome"
+            )
+            .style.display=
+            "block";
+
+
+        document
+            .getElementById(
+                "controls"
+            )
+            .style.display=
+            "none";
+
+
+        document
+            .getElementById(
+                "gameLibrary"
+            )
+            .innerHTML=`
+
+            <div class="empty">
+
+            <h2>
+            Could Not Load Games
+            </h2>
+
+            <p>
+            ${escapeHTML(
+                error.message
+            )}
+            </p>
+
+            <p>
+            Make sure the launcher is running
+            through the local server and that
+            <strong>
+            games/games.json
+            </strong>
+            exists.
+            </p>
+
+            </div>
+
+            `;
+
+    }
+
+}
+
+
+function validateManifest(data){
+
+    if(
+        !Array.isArray(data)
+    ){
+
+        throw new Error(
+            "The manifest must contain a JSON array."
+        );
+
+    }
+
+
+    data.forEach(
+        (
+            game,
+            index
+        )=>{
+
+            if(!game.name){
+
+                throw new Error(
+                    `Game ${index+1} is missing a name.`
+                );
+
+            }
+
+
+            if(!game.file){
+
+                throw new Error(
+                    `${game.name} is missing a file.`
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+RENDER GAMES
+========================================================= */
+
+function renderGames(){
+
+    const library=
+        document.getElementById(
+            "gameLibrary"
+        );
+
+
+    const search=
+        document
+            .getElementById(
+                "searchInput"
+            )
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    let filtered=
+        games.filter(
+            game=>{
+
+                const searchable=
+                    [
+                        game.name,
+                        game.description,
+                        game.author,
+                        game.category
+                    ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+
+                return searchable.includes(
+                    search
+                );
+
+            }
+        );
+
+
+    if(
+        currentView==="favorites"
+    ){
+
+        filtered=
+            filtered.filter(
+                game=>
+                    isFavorite(
+                        game.file
+                    )
+            );
+
+    }
+
+
+    if(
+        !filtered.length
+    ){
+
+        library.innerHTML=`
+
+        <div class="empty">
+
+        <h2>
+        ${
+            currentView==="favorites"
+            ?
+            "No Favorite Games"
+            :
+            "No Games Found"
+        }
+        </h2>
+
+        <p>
+        ${
+            currentView==="favorites"
+            ?
+            "Click the ❤️ button on a game to add it to your favorites."
+            :
+            "Try another search or add a game to your manifest."
+        }
+        </p>
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const categories={};
+
+
+    filtered.forEach(
+        game=>{
+
+            const category=
+                game.category ||
+                "Other";
+
+
+            if(
+                !categories[category]
+            ){
+
+                categories[category]=[];
+
+            }
+
+
+            categories[category]
+                .push(
+                    game
+                );
+
+        }
+    );
+
+
+    let html="";
+
+
+    const categoryOrder=
+        [
+            "Core",
+            "Community",
+            "Other"
+        ];
+
+
+    const sortedCategories=
+
+        [
+
+            ...categoryOrder
+                .filter(
+                    category=>
+                        categories[category]
+                ),
+
+            ...Object
+                .keys(
+                    categories
+                )
+                .filter(
+                    category=>
+                        !categoryOrder
+                            .includes(
+                                category
+                            )
+                )
+
+        ];
+
+
+    sortedCategories.forEach(
+        category=>{
+
+            html+=`
+
+            <section class="category">
+
+            <h2>
+
+            ${
+                category==="Core"
+                ?
+                "⭐"
+                :
+                category==="Community"
+                ?
+                "🌐"
+                :
+                "🎮"
+            }
+
+            ${escapeHTML(
+                category
+            )}
+
+            </h2>
+
+            <div class="game-grid">
+
+            `;
+
+
+            categories[category]
+                .forEach(
+                    game=>
+                        html+=
+                            createGameCard(
+                                game
+                            )
+                );
+
+
+            html+=`
+
+            </div>
+
+            </section>
+
+            `;
+
+        }
+    );
+
+
+    library.innerHTML=
+        html;
+
+}
+
+
+function createGameCard(game){
+
+    const icon=
+        game.icon ||
+        "🎮";
+
+
+    const description=
+        game.description ||
+        "No description provided.";
+
+
+    const favorite=
+        isFavorite(
+            game.file
+        );
+
+
+    const authorHTML=
+
+        game.author
+
+        ?
+
+        `<div class="game-author">
+        Made by:
+        <strong>
+        ${escapeHTML(
+            game.author
+        )}
+        </strong>
+        </div>`
+
+        :
+
+        "";
+
+
+    return `
+
+    <article class="game-card">
+
+        <div class="game-icon">
+        ${escapeHTML(
+            icon
+        )}
+        </div>
+
+        <h3>
+        ${escapeHTML(
+            game.name
+        )}
+        </h3>
+
+        <div class="game-description">
+        ${escapeHTML(
+            description
+        )}
+        </div>
+
+        ${authorHTML}
+
+        <div class="game-actions">
+
+            <button
+            class="primary"
+            onclick='launchGame(${JSON.stringify(game.file)})'
+            >
+            ▶️ Play
+            </button>
+
+            <button
+            class="favorite-button
+            ${favorite?"favorited":""}"
+            onclick='toggleFavorite(${JSON.stringify(game.file)})'
+            title="${
+                favorite
+                ?
+                "Remove from Favorites"
+                :
+                "Add to Favorites"
+            }"
+            aria-label="${
+                favorite
+                ?
+                "Remove from Favorites"
+                :
+                "Add to Favorites"
+            }"
+            >
+            ${
+                favorite
+                ?
+                "❤️"
+                :
+                "♡"
+            }
+            </button>
+
+        </div>
+
+    </article>
+
+    `;
+
+}
+
+
+/* =========================================================
+LAUNCH GAME
+========================================================= */
+
+function launchGame(file){
+
+    if(!file){
+
+        notify(
+            "This game does not have a file."
+        );
+
+        return;
+
+    }
+
+
+    const gamePath=
+        "games/" +
+        encodeURI(
+            file
+        );
+
+
+    window.location.href=
+        gamePath;
+
+}
+
+
+/* =========================================================
+CLEAR GAMES
+========================================================= */
+
+function clearGames(){
+
+    games=[];
+
+    manifestFile=null;
+
+    currentView="all";
+
+
+    document
+        .getElementById(
+            "gameLibrary"
+        )
+        .innerHTML="";
+
+
+    document
+        .getElementById(
+            "controls"
+        )
+        .style.display=
+        "none";
+
+
+    document
+        .getElementById(
+            "welcome"
+        )
+        .style.display=
+        "block";
+
+
+    document
+        .getElementById(
+            "searchInput"
+        )
+        .value="";
+
+
+    updateViewButtons();
+
+}
+
+
+/* =========================================================
+INSTRUCTIONS
+========================================================= */
+
+function openInstructions(){
+
+    document
+        .getElementById(
+            "instructionsModal"
+        )
+        .classList.add(
+            "active"
+        );
+
+}
+
+
+function closeInstructions(){
+
+    document
+        .getElementById(
+            "instructionsModal"
+        )
+        .classList.remove(
+            "active"
+        );
+
+}
+
+
+/* =========================================================
+ACCOUNT MODAL
+========================================================= */
+
+function closeAccount(){
+
+    document
+        .getElementById(
+            "accountModal"
+        )
+        .classList.remove(
+            "active"
+        );
+
+}
+
+
+/* =========================================================
+NOTIFICATIONS
+========================================================= */
+
+function notify(message){
+
+    const box=
+        document.getElementById(
+            "notification"
+        );
+
+
+    box.textContent=
+        message;
+
+
+    box.style.display=
+        "block";
+
+
+    clearTimeout(
+        window.notificationTimer
+    );
+
+
+    window.notificationTimer=
+        setTimeout(
+            ()=>
+                box.style.display=
+                    "none",
+            2500
+        );
+
+}
+
+
+/* =========================================================
+ESCAPE HTML
+========================================================= */
+
+function escapeHTML(text){
+
+    return String(
+        text ??
+        ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+CLOSE MODALS WITH ESCAPE
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key==="Escape"
+        ){
+
+            document
+                .querySelectorAll(
+                    ".modal.active"
+                )
+                .forEach(
+                    modal=>
+                        modal.classList
+                            .remove(
+                                "active"
+                            )
+                );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+INITIALIZE
+========================================================= */
+
+updateViewButtons();
+
+loadManifest();
+
+checkAccountSession();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+[
+    {
+        "name": "Bad Apples+",
+        "file": "Bad Apples+.html",
+        "description": "A multiplayer deception and trivia game.",
+        "icon": "🍎",
+        "category": "Core",
+        "author": "Jewel"
+    },
+    {
+        "name": "Dungeons & Dragons",
+        "file": "Dungeons And Dragons.html",
+        "description": "An adventure through a world of dungeons and dragons.",
+        "icon": "🐉",
+        "category": "Core",
+        "author": "Jewel"
+    },
+    {
+        "name": "Infinity Ball",
+        "file": "Infinity Ball.html",
+        "description": "A physics-based game with expandable levels and content.",
+        "icon": "⚽",
+        "category": "Core",
+        "author": "Jewel"
+    },
+    {
+        "name": "Psychology",
+        "file": "Psychology.html",
+        "description": "A turn based rpg",
+        "icon": "👁️",
+        "category": "Community",
+        "author": "ACOfan3"
+    },
+    {
+        "name": "Notepad",
+        "file": "Notepad.html",
+        "description": "A notepad",
+        "icon": "N",
+        "category": "Core",
+        "author": "Jewel"
+    },
+    {
+        "name": "Kaboom Critters",
+        "file": "KaboomCritters.html",
+        "description": "A game inspired by exploding kittens",
+        "icon": "💥",
+        "category": "Core",
+        "author": "Jewel"
+    },
+    {
+        "name": "Arctic Estate",
+        "file": "ArcticEstate.html",
+        "description": "A monopoly inspired game about penguins",
+        "icon": "$$$",
+        "category": "Community",
+        "author": "FUCKYOU STUDIOS"
+    },
+    {
+        "name": "Bad Apples Multiplayer",
+        "file": "Bad Apples Multiplayer.html",
+        "description": "Bad apples online",
+        "icon": "🌐🍎",
+        "category": "Core",
+        "author": "Jewel"
+    }
+]

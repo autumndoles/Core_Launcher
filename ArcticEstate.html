@@ -1,0 +1,2299 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Arctic Estate</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #071a2b, #123d5a, #071a2b);
+    color: white;
+    min-height: 100vh;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 4px;
+    background: #5bc0eb;
+    color: #06131f;
+}
+
+button:hover {
+    transform: scale(1.03);
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+input,
+select {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin: 5px;
+    font-size: 15px;
+}
+
+#menu {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.menu-box {
+    max-width: 700px;
+    width: 100%;
+    background: rgba(0,0,0,0.7);
+    border-radius: 25px;
+    padding: 35px;
+    text-align: center;
+}
+
+.menu-box h1 {
+    font-size: 55px;
+    margin: 0;
+}
+
+.subtitle {
+    color: #bde7ff;
+    margin: 10px 0 30px;
+}
+
+.setup-row {
+    margin: 15px 0;
+}
+
+.start {
+    width: 90%;
+    background: #f4d35e;
+    font-size: 20px;
+}
+
+.token-grid {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.token-choice {
+    font-size: 32px;
+    padding: 8px 14px;
+    background: #173f59;
+    border: 2px solid transparent;
+}
+
+.token-choice.selected {
+    border-color: #f4d35e;
+    background: #245c7d;
+}
+
+#game {
+    display: none;
+    padding: 15px;
+}
+
+.topbar {
+    max-width: 1500px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.title {
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.turn {
+    background: rgba(0,0,0,0.5);
+    padding: 10px 15px;
+    border-radius: 10px;
+}
+
+#message {
+    max-width: 1200px;
+    margin: 12px auto;
+    padding: 14px;
+    border-radius: 12px;
+    text-align: center;
+    background: rgba(0,0,0,0.55);
+}
+
+.game-layout {
+    max-width: 1500px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 250px minmax(500px, 1fr) 270px;
+    gap: 15px;
+}
+
+.panel {
+    background: rgba(0,0,0,0.45);
+    border-radius: 16px;
+    padding: 15px;
+}
+
+#board {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    gap: 3px;
+    background: #07131c;
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.space {
+    background: #e9f7ff;
+    color: #071a2b;
+    border-radius: 5px;
+    position: relative;
+    padding: 4px;
+    font-size: 10px;
+    overflow: hidden;
+}
+
+.space.center-space {
+    background: linear-gradient(135deg, #124a6b, #092638);
+    color: white;
+    grid-column: 2 / 9;
+    grid-row: 2 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.space-name {
+    font-weight: bold;
+}
+
+.space-price {
+    font-size: 9px;
+}
+
+.property-color {
+    height: 7px;
+    margin: -4px -4px 3px;
+    background: #5bc0eb;
+}
+
+.tokens {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    display: flex;
+    gap: 1px;
+    font-size: 18px;
+}
+
+.player-box {
+    background: rgba(255,255,255,0.08);
+    padding: 10px;
+    border-radius: 9px;
+    margin-bottom: 8px;
+}
+
+.player-box.active {
+    outline: 2px solid #f4d35e;
+}
+
+.player-box.bankrupt {
+    opacity: 0.35;
+    text-decoration: line-through;
+}
+
+.player-money {
+    color: #9be564;
+}
+
+.property-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.property-item {
+    background: rgba(255,255,255,0.08);
+    padding: 8px;
+    border-radius: 7px;
+    margin: 5px 0;
+    font-size: 13px;
+}
+
+.log {
+    height: 250px;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+.log-entry {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 6px;
+}
+
+.controls {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.dice {
+    font-size: 42px;
+    margin: 5px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 20px;
+}
+
+.modal-box {
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #102b3d;
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.chance-card {
+    background: #f4d35e;
+    color: #171717;
+    border-radius: 12px;
+    padding: 15px;
+    min-height: 130px;
+    cursor: pointer;
+}
+
+.chance-card:hover {
+    transform: translateY(-5px);
+}
+
+.chance-icon {
+    font-size: 35px;
+}
+
+.loan-box {
+    background: rgba(255,255,255,0.08);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+@media(max-width: 1100px) {
+
+    .game-layout {
+        grid-template-columns: 1fr;
+    }
+
+    #board {
+        max-width: 700px;
+        margin: auto;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+
+<div class="menu-box">
+
+<h1>🐧 Arctic Estate</h1>
+
+<div class="subtitle">
+Build your frozen fortune. Buy property. Take risks. Avoid bankruptcy.
+</div>
+
+<div class="setup-row">
+
+<label>Total Players:</label>
+
+<select id="playerCount">
+
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4" selected>4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+
+</select>
+
+</div>
+
+<div class="setup-row">
+
+<label>Human Players:</label>
+
+<select id="humanCount">
+
+<option value="1" selected>1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+
+</select>
+
+</div>
+
+<p>Choose your penguin:</p>
+
+<div class="token-grid">
+
+<button class="token-choice selected" onclick="chooseToken(this,'🐧')">🐧</button>
+<button class="token-choice" onclick="chooseToken(this,'🧊')">🧊</button>
+<button class="token-choice" onclick="chooseToken(this,'🐟')">🐟</button>
+<button class="token-choice" onclick="chooseToken(this,'🦭')">🦭</button>
+<button class="token-choice" onclick="chooseToken(this,'🐳')">🐳</button>
+<button class="token-choice" onclick="chooseToken(this,'🦀')">🦀</button>
+<button class="token-choice" onclick="chooseToken(this,'🐙')">🐙</button>
+<button class="token-choice" onclick="chooseToken(this,'🐻‍❄️')">🐻‍❄️</button>
+
+</div>
+
+<br>
+
+<button class="start" onclick="startGame()">
+START ARCTIC ESTATE
+</button>
+
+</div>
+
+</div>
+
+
+<div id="game">
+
+<div class="topbar">
+
+<div class="title">
+🐧 Arctic Estate
+</div>
+
+<div class="turn" id="turnText"></div>
+
+</div>
+
+<div id="message">
+Welcome to Arctic Estate!
+</div>
+
+
+<div class="game-layout">
+
+
+<div class="panel">
+
+<h3>Players</h3>
+
+<div id="players"></div>
+
+<hr>
+
+<h3>Loans</h3>
+
+<div id="loanInfo"></div>
+
+</div>
+
+
+<div class="panel">
+
+<div id="board"></div>
+
+<div class="controls">
+
+<div class="dice" id="diceDisplay">
+🎲 🎲
+</div>
+
+<button id="rollButton" onclick="rollDice()">
+ROLL DICE
+</button>
+
+<button onclick="openLoanMenu()">
+🏦 LOANS
+</button>
+
+<button onclick="openBNPLMenu()">
+💳 BUY NOW, PAY LATER
+</button>
+
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>Properties</h3>
+
+<div class="property-list" id="properties"></div>
+
+<hr>
+
+<h3>Game Log</h3>
+
+<div class="log" id="log"></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="modal" id="modal">
+
+<div class="modal-box">
+
+<h2 id="modalTitle"></h2>
+
+<div id="modalContent"></div>
+
+<br>
+
+<button onclick="closeModal()">
+Close
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+
+let players = [];
+
+let currentPlayer = 0;
+
+let gameStarted = false;
+
+let selectedToken = "🐧";
+
+let board = [];
+
+let chanceDeck = [];
+
+let chanceOptions = [];
+
+let rolled = false;
+
+let diceTotal = 0;
+
+let turnTimer = null;
+
+
+const startingMoney = 1500;
+
+
+const tokenList = [
+"🐧",
+"🧊",
+"🐟",
+"🦭",
+"🐳",
+"🦀",
+"🐙",
+"🐻‍❄️"
+];
+
+
+const spaces = [
+
+{
+name:"START",
+type:"start"
+},
+
+{
+name:"Snowy Street",
+type:"property",
+price:100,
+rent:20,
+owner:null,
+color:"white"
+},
+
+{
+name:"Chance",
+type:"chance"
+},
+
+{
+name:"Iceberg Avenue",
+type:"property",
+price:120,
+rent:24,
+owner:null,
+color:"blue"
+},
+
+{
+name:"Frozen Tax",
+type:"tax",
+amount:100
+},
+
+{
+name:"Ice Prison",
+type:"jail"
+},
+
+{
+name:"Penguin Plaza",
+type:"property",
+price:150,
+rent:30,
+owner:null,
+color:"green"
+},
+
+{
+name:"Chance",
+type:"chance"
+},
+
+{
+name:"Aurora Lane",
+type:"property",
+price:180,
+rent:36,
+owner:null,
+color:"purple"
+},
+
+{
+name:"Snowmobile Road",
+type:"property",
+price:200,
+rent:40,
+owner:null,
+color:"yellow"
+},
+
+{
+name:"Iceberg Harbor",
+type:"property",
+price:220,
+rent:44,
+owner:null,
+color:"orange"
+},
+
+{
+name:"Chance",
+type:"chance"
+},
+
+{
+name:"Polar Station",
+type:"property",
+price:250,
+rent:50,
+owner:null,
+color:"red"
+},
+
+{
+name:"Luxury Ice Tax",
+type:"tax",
+amount:200
+},
+
+{
+name:"Glacier Gardens",
+type:"property",
+price:280,
+rent:56,
+owner:null,
+color:"pink"
+},
+
+{
+name:"Freezing Point",
+type:"free"
+},
+
+{
+name:"Frostbite Boulevard",
+type:"property",
+price:300,
+rent:60,
+owner:null,
+color:"cyan"
+},
+
+{
+name:"Chance",
+type:"chance"
+},
+
+{
+name:"Emperor's Estate",
+type:"property",
+price:350,
+rent:70,
+owner:null,
+color:"gold"
+},
+
+{
+name:"Ice Palace",
+type:"property",
+price:400,
+rent:80,
+owner:null,
+color:"silver"
+},
+
+{
+name:"Go To Ice Prison",
+type:"gotojail"
+},
+
+{
+name:"Penguin Peak",
+type:"property",
+price:450,
+rent:90,
+owner:null,
+color:"white"
+},
+
+{
+name:"Chance",
+type:"chance"
+},
+
+{
+name:"Frozen Financial District",
+type:"property",
+price:500,
+rent:100,
+owner:null,
+color:"blue"
+}
+
+];
+
+
+const chanceTemplates = [
+
+{
+name:"Iceberg Collision",
+icon:"🧊",
+description:"Pay $100 for emergency repairs.",
+effect:"pay",
+amount:100
+},
+
+{
+name:"Blizzard Warning",
+icon:"🌨️",
+description:"Lose your next turn.",
+effect:"skip"
+},
+
+{
+name:"Fish Shortage",
+icon:"🐟",
+description:"Pay $150 for emergency food supplies.",
+effect:"pay",
+amount:150
+},
+
+{
+name:"Polar Bear Visit",
+icon:"🐻‍❄️",
+description:"Pay $200 for property repairs.",
+effect:"pay",
+amount:200
+},
+
+{
+name:"Frozen Assets",
+icon:"❄️",
+description:"Your properties cannot collect rent until your next turn.",
+effect:"freeze"
+},
+
+{
+name:"Sled Accident",
+icon:"🛷",
+description:"Move backward 3 spaces.",
+effect:"back"
+},
+
+{
+name:"Unexpected Tax Bill",
+icon:"💸",
+description:"Pay 10% of your current cash.",
+effect:"percent"
+},
+
+{
+name:"Igloo Bail Free",
+icon:"🏠",
+description:"Keep this card. Use it to escape the Ice Prison for free.",
+effect:"bail"
+}
+
+];
+
+
+function chooseToken(button,token) {
+
+selectedToken = token;
+
+document
+.querySelectorAll(".token-choice")
+.forEach(b => b.classList.remove("selected"));
+
+button.classList.add("selected");
+
+}
+
+
+function startGame() {
+
+let total =
+Number(document.getElementById("playerCount").value);
+
+let humans =
+Number(document.getElementById("humanCount").value);
+
+if(humans > total) {
+
+humans = total;
+
+document.getElementById("humanCount").value = total;
+
+}
+
+players = [];
+
+for(let i=0;i<total;i++) {
+
+players.push({
+
+name:
+i === 0
+? "Player 1"
+: i < humans
+? "Player " + (i+1)
+: "Bot " + (i-humans+1),
+
+human:i < humans,
+
+token:
+i === 0
+? selectedToken
+: tokenList[i],
+
+money:startingMoney,
+
+position:0,
+
+properties:[],
+
+loan:0,
+
+loanInterest:0,
+
+bnpl:[],
+
+alive:true,
+
+skipTurn:0,
+
+frozen:false,
+
+bailCard:false
+
+});
+
+}
+
+board = JSON.parse(JSON.stringify(spaces));
+
+chanceDeck = [];
+
+chanceTemplates.forEach((card,index)=>{
+
+let copies =
+card.effect === "bail"
+? 1
+: 4;
+
+for(let i=0;i<copies;i++) {
+
+chanceDeck.push({
+...card,
+id:Math.random()
+});
+
+}
+
+});
+
+chanceDeck =
+shuffle(chanceDeck);
+
+currentPlayer = 0;
+
+gameStarted = true;
+
+document.getElementById("menu").style.display="none";
+
+document.getElementById("game").style.display="block";
+
+log("Welcome to Arctic Estate!");
+
+log(
+"The Chance deck contains 32 cards, but only one is an Igloo Bail Free card."
+);
+
+render();
+
+}
+
+
+function shuffle(array) {
+
+let a=[...array];
+
+for(let i=a.length-1;i>0;i--) {
+
+let j=Math.floor(Math.random()*(i+1));
+
+[a[i],a[j]]=[a[j],a[i]];
+
+}
+
+return a;
+
+}
+
+
+function rollDice() {
+
+if(rolled || !gameStarted) return;
+
+let player=players[currentPlayer];
+
+if(!player.alive) {
+
+nextTurn();
+
+return;
+
+}
+
+if(player.skipTurn>0) {
+
+player.skipTurn--;
+
+log(player.name+" loses this turn.");
+
+nextTurn();
+
+return;
+
+}
+
+let d1=Math.floor(Math.random()*6)+1;
+
+let d2=Math.floor(Math.random()*6)+1;
+
+diceTotal=d1+d2;
+
+rolled=true;
+
+document.getElementById("diceDisplay").textContent=
+"🎲 "+d1+" + 🎲 "+d2+" = "+diceTotal;
+
+player.position += diceTotal;
+
+if(player.position >= board.length) {
+
+player.position -= board.length;
+
+player.money += 200;
+
+log(player.name+" passed START and collected $200.");
+
+}
+
+log(
+player.name+
+" moved to "+
+board[player.position].name+"."
+);
+
+landOnSpace();
+
+}
+
+
+function landOnSpace() {
+
+let player=players[currentPlayer];
+
+let space=board[player.position];
+
+
+if(space.type==="property") {
+
+if(space.owner===null) {
+
+if(player.money>=space.price) {
+
+if(player.human) {
+
+showPropertyPurchase(space);
+
+} else {
+
+botBuyProperty(space);
+
+}
+
+} else {
+
+log(
+player.name+
+" cannot afford "+
+space.name+"."
+);
+
+finishTurn();
+
+}
+
+}
+
+else if(space.owner!==currentPlayer) {
+
+let owner=players[space.owner];
+
+let rent=space.rent;
+
+if(owner.frozen) {
+
+log(
+owner.name+
+" cannot collect rent right now."
+);
+
+} else {
+
+payPlayer(player,owner,rent);
+
+}
+
+finishTurn();
+
+}
+
+else {
+
+log(player.name+" landed on their own property.");
+
+finishTurn();
+
+}
+
+}
+
+
+else if(space.type==="chance") {
+
+drawChance();
+
+}
+
+
+else if(space.type==="tax") {
+
+payBank(player,space.amount);
+
+finishTurn();
+
+}
+
+
+else if(space.type==="gotojail") {
+
+player.position=5;
+
+log(player.name+" was sent to the Ice Prison!");
+
+finishTurn();
+
+}
+
+
+else {
+
+finishTurn();
+
+}
+
+}
+
+
+function showPropertyPurchase(space) {
+
+openModal(
+
+"Buy Property?",
+
+`
+
+<h2>${space.name}</h2>
+
+<p>Price: $${space.price}</p>
+
+<p>Rent: $${space.rent}</p>
+
+<button onclick="buyProperty(${players[currentPlayer].position})">
+BUY FOR $${space.price}
+</button>
+
+<button onclick="finishTurn()">
+PASS
+</button>
+
+`
+
+);
+
+}
+
+
+function buyProperty(index) {
+
+let player=players[currentPlayer];
+
+let space=board[index];
+
+if(player.money<space.price) {
+
+closeModal();
+
+return;
+
+}
+
+player.money-=space.price;
+
+space.owner=currentPlayer;
+
+player.properties.push(index);
+
+log(
+player.name+
+" bought "+
+space.name+
+" for $"+
+space.price+"."
+);
+
+closeModal();
+
+finishTurn();
+
+}
+
+
+function botBuyProperty(space) {
+
+let player=players[currentPlayer];
+
+let shouldBuy =
+player.money-space.price >= 300 ||
+Math.random()<0.65;
+
+if(shouldBuy) {
+
+player.money-=space.price;
+
+space.owner=currentPlayer;
+
+player.properties.push(player.position);
+
+log(
+player.name+
+" bought "+
+space.name+
+"."
+);
+
+} else {
+
+log(
+player.name+
+" passed on "+
+space.name+"."
+);
+
+}
+
+finishTurn();
+
+}
+
+
+function payPlayer(from,to,amount) {
+
+if(from.money>=amount) {
+
+from.money-=amount;
+
+to.money+=amount;
+
+log(
+from.name+
+" paid $"+
+amount+
+" rent to "+
+to.name+"."
+);
+
+} else {
+
+let remaining=amount-from.money;
+
+to.money+=from.money;
+
+from.money=0;
+
+log(
+from.name+
+" could not fully pay rent."
+);
+
+handleDebt(from,remaining);
+
+}
+
+}
+
+
+function payBank(player,amount) {
+
+if(player.money>=amount) {
+
+player.money-=amount;
+
+log(
+player.name+
+" paid $"+
+amount+
+" to the bank."
+);
+
+} else {
+
+let debt=amount-player.money;
+
+player.money=0;
+
+handleDebt(player,debt);
+
+}
+
+}
+
+
+function handleDebt(player,debt) {
+
+if(player.loan+player.money>=debt) {
+
+player.loan+=debt;
+
+player.loanInterest+=
+Math.ceil(debt*0.1);
+
+log(
+player.name+
+" took on $"+
+debt+
+" in emergency debt."
+);
+
+} else {
+
+bankrupt(player);
+
+}
+
+}
+
+
+function bankrupt(player) {
+
+player.alive=false;
+
+for(let property of player.properties) {
+
+board[property].owner=null;
+
+}
+
+player.properties=[];
+
+log(
+"💸 "+
+player.name+
+" went bankrupt!"
+);
+
+checkWinner();
+
+}
+
+
+function drawChance() {
+
+if(chanceDeck.length===0) {
+
+log("The Chance deck is empty.");
+
+finishTurn();
+
+return;
+
+}
+
+chanceOptions=[];
+
+let temp=[...chanceDeck];
+
+for(let i=0;i<8 && temp.length>0;i++) {
+
+let index=
+Math.floor(Math.random()*temp.length);
+
+chanceOptions.push(temp.splice(index,1)[0]);
+
+}
+
+showChanceOptions();
+
+}
+
+
+function showChanceOptions() {
+
+let html="";
+
+chanceOptions.forEach((card,index)=>{
+
+html+=`
+
+<div class="chance-card"
+onclick="chooseChance(${index})">
+
+<div class="chance-icon">
+${card.icon}
+</div>
+
+<strong>${card.name}</strong>
+
+<p>${card.description}</p>
+
+</div>
+
+`;
+
+});
+
+openModal(
+
+"Choose One Chance Card",
+
+`
+
+<p>
+Pick one card from the eight available options.
+</p>
+
+<div class="card-grid">
+${html}
+</div>
+
+`
+
+);
+
+}
+
+
+function chooseChance(index) {
+
+let chosen=chanceOptions[index];
+
+let deckIndex=
+chanceDeck.findIndex(c=>c.id===chosen.id);
+
+if(deckIndex!==-1) {
+
+chanceDeck.splice(deckIndex,1);
+
+}
+
+let player=players[currentPlayer];
+
+closeModal();
+
+log(
+player.name+
+" selected "+chosen.name+"."
+);
+
+applyChance(chosen);
+
+}
+
+
+function applyChance(card) {
+
+let player=players[currentPlayer];
+
+if(card.effect==="pay") {
+
+payBank(player,card.amount);
+
+finishTurn();
+
+}
+
+
+else if(card.effect==="percent") {
+
+let amount=
+Math.ceil(player.money*0.1);
+
+payBank(player,amount);
+
+finishTurn();
+
+}
+
+
+else if(card.effect==="skip") {
+
+player.skipTurn=1;
+
+log(
+player.name+
+" will lose their next turn."
+);
+
+finishTurn();
+
+}
+
+
+else if(card.effect==="back") {
+
+player.position-=3;
+
+if(player.position<0)
+player.position+=board.length;
+
+log(
+player.name+
+" moved backward three spaces."
+);
+
+finishTurn();
+
+}
+
+
+else if(card.effect==="freeze") {
+
+player.frozen=true;
+
+log(
+player.name+
+" cannot collect rent until their next turn."
+);
+
+finishTurn();
+
+}
+
+
+else if(card.effect==="bail") {
+
+player.bailCard=true;
+
+log(
+player.name+
+" received the RARE Igloo Bail Free card!"
+);
+
+finishTurn();
+
+}
+
+}
+
+
+function openLoanMenu() {
+
+let player=players[currentPlayer];
+
+if(!player.human) return;
+
+openModal(
+
+"🏦 Arctic Bank",
+
+`
+
+<div class="loan-box">
+
+<h3>Take Out a Loan</h3>
+
+<p>
+Borrow $500.
+</p>
+
+<p>
+Repayment: $600.
+</p>
+
+<button onclick="takeLoan()">
+BORROW $500
+</button>
+
+</div>
+
+<div class="loan-box">
+
+<h3>Current Debt</h3>
+
+<p>
+Loan balance: $${player.loan}
+</p>
+
+<p>
+Interest: $${player.loanInterest}
+</p>
+
+<button onclick="repayLoan()">
+REPAY $500
+</button>
+
+</div>
+
+`
+
+);
+
+}
+
+
+function takeLoan() {
+
+let player=players[currentPlayer];
+
+player.money+=500;
+
+player.loan+=500;
+
+player.loanInterest+=100;
+
+log(
+player.name+
+" borrowed $500 from the Arctic Bank."
+);
+
+closeModal();
+
+render();
+
+}
+
+
+function repayLoan() {
+
+let player=players[currentPlayer];
+
+if(player.loan<=0) {
+
+return;
+
+}
+
+if(player.money<500) {
+
+log("Not enough money to repay $500.");
+
+return;
+
+}
+
+player.money-=500;
+
+player.loan-=500;
+
+player.loanInterest=
+Math.max(
+0,
+player.loanInterest-100
+);
+
+log(
+player.name+
+" repaid $500 of their loan."
+);
+
+closeModal();
+
+render();
+
+}
+
+
+function openBNPLMenu() {
+
+let player=players[currentPlayer];
+
+if(!player.human) return;
+
+let available=
+board.filter(
+s =>
+s.type==="property" &&
+s.owner===null &&
+s.price>=250
+);
+
+let html="";
+
+available.forEach(space=>{
+
+let index=board.indexOf(space);
+
+html+=`
+
+<div class="loan-box">
+
+<strong>${space.name}</strong>
+
+<p>
+Price: $${space.price}
+</p>
+
+<p>
+Down payment: $${Math.ceil(space.price*0.25)}
+</p>
+
+<p>
+Remaining balance: $${Math.ceil(space.price*0.75)}
+</p>
+
+<button onclick="buyBNPL(${index})">
+BUY NOW, PAY LATER
+</button>
+
+</div>
+
+`;
+
+});
+
+if(html==="") {
+
+html="<p>No properties currently available for BNPL.</p>";
+
+}
+
+openModal(
+
+"💳 Buy Now, Pay Later",
+
+html
+
+);
+
+}
+
+
+function buyBNPL(index) {
+
+let player=players[currentPlayer];
+
+let space=board[index];
+
+let down=
+Math.ceil(space.price*0.25);
+
+if(player.money<down) {
+
+log("You cannot afford the down payment.");
+
+return;
+
+}
+
+player.money-=down;
+
+space.owner=currentPlayer;
+
+player.properties.push(index);
+
+player.bnpl.push({
+
+property:index,
+
+remaining:
+Math.ceil(space.price*0.75),
+
+payments:3
+
+});
+
+log(
+
+player.name+
+" bought "+
+space.name+
+" using Buy Now, Pay Later."
+
+);
+
+closeModal();
+
+render();
+
+}
+
+
+function processBNPL(player) {
+
+if(player.bnpl.length===0)
+return;
+
+for(let i=player.bnpl.length-1;i>=0;i--) {
+
+let plan=player.bnpl[i];
+
+let payment=
+Math.ceil(
+plan.remaining/plan.payments
+);
+
+if(player.money>=payment) {
+
+player.money-=payment;
+
+plan.remaining-=payment;
+
+plan.payments--;
+
+log(
+player.name+
+" made a BNPL payment of $"+
+payment+"."
+);
+
+if(plan.remaining<=0) {
+
+player.bnpl.splice(i,1);
+
+log(
+player.name+
+" fully paid off a property!"
+);
+
+}
+
+} else {
+
+log(
+player.name+
+" missed a BNPL payment."
+);
+
+player.loan+=payment;
+
+player.loanInterest+=
+Math.ceil(payment*0.1);
+
+}
+
+}
+
+}
+
+
+function finishTurn() {
+
+if(!gameStarted)
+return;
+
+let player=players[currentPlayer];
+
+if(player.frozen) {
+
+player.frozen=false;
+
+}
+
+processBNPL(player);
+
+if(player.loan>0) {
+
+let interest=
+Math.ceil(player.loan*0.05);
+
+player.loanInterest+=interest;
+
+if(player.money>=interest) {
+
+player.money-=interest;
+
+log(
+player.name+
+" paid $"+
+interest+
+" in loan interest."
+);
+
+}
+
+}
+
+checkWinner();
+
+if(!gameStarted)
+return;
+
+rolled=false;
+
+currentPlayer=
+findNextPlayer(currentPlayer);
+
+render();
+
+if(!players[currentPlayer].human) {
+
+setTimeout(botTurn,800);
+
+}
+
+}
+
+
+function findNextPlayer(index) {
+
+let next=index;
+
+do {
+
+next++;
+
+if(next>=players.length)
+next=0;
+
+} while(!players[next].alive);
+
+return next;
+
+}
+
+
+function botTurn() {
+
+let bot=players[currentPlayer];
+
+if(!bot || bot.human || !bot.alive)
+return;
+
+if(bot.skipTurn>0) {
+
+bot.skipTurn--;
+
+log(
+bot.name+
+" loses their turn."
+);
+
+finishTurn();
+
+return;
+
+}
+
+setTimeout(()=>{
+
+let d1=
+Math.floor(Math.random()*6)+1;
+
+let d2=
+Math.floor(Math.random()*6)+1;
+
+diceTotal=d1+d2;
+
+rolled=true;
+
+bot.position+=diceTotal;
+
+if(bot.position>=board.length) {
+
+bot.position-=board.length;
+
+bot.money+=200;
+
+}
+
+log(
+bot.name+
+" rolled "+
+diceTotal+
+"."
+);
+
+landOnSpace();
+
+},600);
+
+}
+
+
+function checkWinner() {
+
+let alive=
+players.filter(p=>p.alive);
+
+if(alive.length<=1) {
+
+gameStarted=false;
+
+let winner=alive[0];
+
+openModal(
+
+"🏆 GAME OVER",
+
+`
+
+<h1>${winner.token}</h1>
+
+<h2>${winner.name} wins Arctic Estate!</h2>
+
+<p>
+The last penguin standing has conquered the Arctic.
+</p>
+
+<button onclick="location.reload()">
+PLAY AGAIN
+</button>
+
+`
+
+);
+
+}
+
+}
+
+
+function render() {
+
+renderPlayers();
+
+renderProperties();
+
+renderBoard();
+
+renderLoanInfo();
+
+document.getElementById("turnText").textContent=
+players[currentPlayer].name+
+"'s Turn "+
+players[currentPlayer].token;
+
+document.getElementById("rollButton").disabled=
+!players[currentPlayer].human ||
+rolled;
+
+}
+
+
+function renderPlayers() {
+
+let container=
+document.getElementById("players");
+
+container.innerHTML="";
+
+players.forEach((player,index)=>{
+
+let div=
+document.createElement("div");
+
+div.className="player-box";
+
+if(index===currentPlayer)
+div.classList.add("active");
+
+if(!player.alive)
+div.classList.add("bankrupt");
+
+div.innerHTML=`
+
+<strong>
+${player.token}
+${player.name}
+</strong>
+
+<br>
+
+<span class="player-money">
+$${player.money}
+</span>
+
+<br>
+
+Properties:
+${player.properties.length}
+
+`;
+
+container.appendChild(div);
+
+});
+
+}
+
+
+function renderProperties() {
+
+let container=
+document.getElementById("properties");
+
+container.innerHTML="";
+
+let player=players[currentPlayer];
+
+player.properties.forEach(index=>{
+
+let space=board[index];
+
+let div=
+document.createElement("div");
+
+div.className="property-item";
+
+div.innerHTML=
+
+"<strong>"+
+space.name+
+"</strong><br>"+
+"Rent: $"+
+space.rent;
+
+container.appendChild(div);
+
+});
+
+}
+
+
+function renderLoanInfo() {
+
+let container=
+document.getElementById("loanInfo");
+
+container.innerHTML="";
+
+players.forEach(player=>{
+
+if(player.loan>0) {
+
+container.innerHTML+=`
+
+<div class="property-item">
+
+${player.name}
+
+<br>
+
+Debt:
+$${player.loan}
+
+<br>
+
+Interest:
+$${player.loanInterest}
+
+</div>
+
+`;
+
+}
+
+});
+
+}
+
+
+function renderBoard() {
+
+let boardElement=
+document.getElementById("board");
+
+boardElement.innerHTML="";
+
+let positions=[];
+
+for(let i=0;i<24;i++) {
+
+let row=0;
+let col=0;
+
+if(i<=8) {
+
+row=8;
+col=i;
+
+}
+
+else if(i<=14) {
+
+col=8;
+row=8-(i-8);
+
+}
+
+else if(i<=20) {
+
+row=0;
+col=8-(i-14);
+
+}
+
+else {
+
+col=0;
+row=i-20;
+
+}
+
+positions.push({row,col});
+
+}
+
+for(let i=0;i<24;i++) {
+
+let space=board[i];
+
+let div=
+document.createElement("div");
+
+div.className="space";
+
+let pos=positions[i];
+
+div.style.gridRow=
+(pos.row+1);
+
+div.style.gridColumn=
+(pos.col+1);
+
+if(space.type==="property") {
+
+div.innerHTML=
+
+`
+
+<div class="property-color"
+style="background:${space.color}">
+</div>
+
+<div class="space-name">
+${space.name}
+</div>
+
+<div class="space-price">
+$${space.price}
+</div>
+
+`;
+
+} else {
+
+div.innerHTML=
+
+`
+
+<div class="space-name">
+${space.name}
+</div>
+
+`;
+
+}
+
+let tokenHTML="";
+
+players.forEach(player=>{
+
+if(player.alive &&
+player.position===i) {
+
+tokenHTML+=player.token;
+
+}
+
+});
+
+if(tokenHTML) {
+
+div.innerHTML+=
+`<div class="tokens">${tokenHTML}</div>`;
+
+}
+
+if(space.owner!==null) {
+
+div.style.outline=
+"3px solid white";
+
+}
+
+boardElement.appendChild(div);
+
+}
+
+let center=
+document.createElement("div");
+
+center.className=
+"space center-space";
+
+center.innerHTML=
+
+`
+
+<div>
+
+<h1>🐧</h1>
+
+<h2>ARCTIC<br>ESTATE</h2>
+
+<p>
+The frozen world of property capitalism.
+</p>
+
+</div>
+
+`;
+
+boardElement.appendChild(center);
+
+}
+
+
+function log(message) {
+
+let box=
+document.getElementById("log");
+
+let entry=
+document.createElement("div");
+
+entry.className=
+"log-entry";
+
+entry.textContent=
+message;
+
+box.prepend(entry);
+
+}
+
+
+function openModal(title,content) {
+
+document.getElementById("modalTitle")
+.textContent=title;
+
+document.getElementById("modalContent")
+.innerHTML=content;
+
+document.getElementById("modal")
+.style.display="flex";
+
+}
+
+
+function closeModal() {
+
+document.getElementById("modal")
+.style.display="none";
+
+}
+
+
+</script>
+
+</body>
+</html>
+```
