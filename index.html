@@ -1,14 +1,17 @@
-```html
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Core Launcher</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+    box-sizing:border-box
+}
 
 body{
     margin:0;
@@ -18,7 +21,8 @@ body{
     background:radial-gradient(circle at top,#302047,#111016 60%)
 }
 
-button,input{
+button,
+input{
     font:inherit
 }
 
@@ -343,10 +347,6 @@ main{
     margin-top:20px
 }
 
-#fileInput{
-    display:none
-}
-
 .notification{
     position:fixed;
     bottom:25px;
@@ -384,6 +384,7 @@ footer{
     }
 
 }
+
 </style>
 
 </head>
@@ -404,30 +405,36 @@ footer{
 id="allGamesButton"
 class="primary"
 onclick="showAllGames()"
+
 >
-🎮 All Games
-</button>
+
+🎮 All Games </button>
 
 <button
 id="favoritesButton"
 onclick="showFavorites()"
+
 >
-❤️ Favorites
-</button>
+
+❤️ Favorites </button>
 
 <button
 id="accountButton"
 class="account-button"
 onclick="openAccount()"
+
 >
+
 <span
 id="accountStatusDot"
 class="account-status-dot"
-></span>
+
+> </span>
 
 <span id="accountButtonText">
 👤 Core Account
 </span>
+
 </button>
 
 <button onclick="openInstructions()">
@@ -450,6 +457,7 @@ class="search"
 type="text"
 placeholder="🔍 Search games..."
 oninput="renderGames()"
+
 >
 
 <button onclick="clearGames()">
@@ -498,7 +506,6 @@ Game Launcher • HTML Game Platform
 
 </div>
 
-
 <!-- ACCOUNT MODAL -->
 
 <div
@@ -535,7 +542,6 @@ Close
 </div>
 
 </div>
-
 
 <!-- INSTRUCTIONS MODAL -->
 
@@ -605,14 +611,23 @@ Close
 
 </div>
 
-
 <div
 id="notification"
 class="notification"
 ></div>
 
-
 <script>
+
+/* =========================================================
+CONFIGURATION
+========================================================= */
+
+const ACCOUNTS_SERVER =
+    "https://core-accounts.onrender.com";
+
+const LAUNCHER_URL =
+    "https://core-launcher-hb1m.onrender.com";
+
 
 /* =========================================================
 GAME STATE
@@ -629,14 +644,6 @@ const FAVORITES_STORAGE_KEY=
 
 
 /* =========================================================
-CORE GAMES ACCOUNT CONFIGURATION
-========================================================= */
-
-const CORE_ACCOUNTS_URL =
-"https://core-accounts.onrender.com";
-
-
-/* =========================================================
 ACCOUNT STATE
 ========================================================= */
 
@@ -644,21 +651,30 @@ let currentAccount=null;
 
 
 /* =========================================================
-ACCOUNT SESSION
+ACCOUNT SESSION CHECK
 ========================================================= */
 
 async function checkAccountSession(){
+
+    const dot=
+        document.getElementById(
+            "accountStatusDot"
+        );
+
+    const buttonText=
+        document.getElementById(
+            "accountButtonText"
+        );
+
 
     try{
 
         const response=
             await fetch(
-                CORE_ACCOUNTS_URL +
+                ACCOUNTS_SERVER +
                 "/api/me",
                 {
-                    method:"GET",
-                    credentials:"include",
-                    cache:"no-store"
+                    credentials:"include"
                 }
             );
 
@@ -701,6 +717,131 @@ async function checkAccountSession(){
         setLoggedOut();
 
     }
+
+}
+
+
+/* =========================================================
+TOKEN HANDOFF
+========================================================= */
+
+async function checkHandoffToken(){
+
+    const params=
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const handoffToken=
+        params.get(
+            "handoff"
+        );
+
+
+    if(!handoffToken){
+
+        return;
+
+    }
+
+
+    console.log(
+        "Core Games login handoff detected."
+    );
+
+
+    try{
+
+        const response=
+            await fetch(
+                ACCOUNTS_SERVER +
+                "/api/handoff/exchange",
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    credentials:"include",
+
+                    body:
+                        JSON.stringify({
+                            token:
+                                handoffToken
+                        })
+                }
+            );
+
+
+        const data=
+            await response.json();
+
+
+        if(
+            response.ok &&
+            data.success &&
+            data.user
+        ){
+
+            setLoggedIn(
+                data.user.username
+            );
+
+
+            notify(
+                "Logged in as " +
+                data.user.username +
+                "!"
+            );
+
+
+        }else{
+
+            console.error(
+                "Login handoff failed:",
+                data
+            );
+
+
+            notify(
+                data.message ||
+                "Unable to complete Core Games login."
+            );
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "Login handoff error:",
+            error
+        );
+
+
+        notify(
+            "Unable to connect to Core Games Accounts."
+        );
+
+    }
+
+
+    /*
+    Remove the handoff token from
+    the URL immediately.
+
+    This prevents the token from
+    remaining in browser history
+    or being reused accidentally.
+    */
+
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
 
 }
 
@@ -869,14 +1010,33 @@ function openAccount(){
 
 
 /* =========================================================
-OPEN FULL ACCOUNT SYSTEM
+OPEN CORE ACCOUNTS
 ========================================================= */
 
 function openFullAccount(){
 
+    /*
+    Open the Core Games Accounts website
+    in a new browser tab.
+
+    After the user logs in, the Accounts
+    server should redirect back to:
+
+    https://core-launcher-hb1m.onrender.com/?handoff=TOKEN
+
+    The launcher will automatically
+    exchange that token.
+    */
+
+    const accountURL =
+        ACCOUNTS_SERVER +
+        "/?returnTo=launcher";
+
+
     window.open(
-        CORE_ACCOUNTS_URL,
-        "_blank"
+        accountURL,
+        "_blank",
+        "noopener"
     );
 
 }
@@ -892,7 +1052,7 @@ async function logoutAccount(){
 
         const response=
             await fetch(
-                CORE_ACCOUNTS_URL +
+                ACCOUNTS_SERVER +
                 "/api/logout",
                 {
                     method:"POST",
@@ -938,28 +1098,6 @@ async function logoutAccount(){
     }
 
 }
-
-
-/* =========================================================
-AUTOMATIC ACCOUNT SESSION CHECK
-========================================================= */
-
-/*
-Checks the Core Games account every 3 seconds.
-
-This means:
-
-1. Launcher is open.
-2. User clicks Log In.
-3. Account page opens in a new tab.
-4. User logs in.
-5. Launcher automatically detects the account.
-*/
-
-setInterval(
-    checkAccountSession,
-    3000
-);
 
 
 /* =========================================================
@@ -1858,7 +1996,19 @@ updateViewButtons();
 
 loadManifest();
 
-checkAccountSession();
+/*
+First check for a handoff token.
+Then check the normal account session.
+
+The handoff is used when returning
+from the Accounts website.
+*/
+
+checkHandoffToken()
+    .then(
+        () =>
+            checkAccountSession()
+    );
 
 </script>
 
