@@ -342,10 +342,6 @@ main{
     margin-top:20px
 }
 
-#fileInput{
-    display:none
-}
-
 .notification{
     position:fixed;
     bottom:25px;
@@ -615,6 +611,10 @@ class="notification"
 
 <script>
 
+/* =========================================================
+GAME STATE
+========================================================= */
+
 let games=[];
 
 let manifestFile=null;
@@ -626,6 +626,14 @@ const FAVORITES_STORAGE_KEY=
 
 
 /* =========================================================
+CORE GAMES ACCOUNT SERVER
+========================================================= */
+
+const ACCOUNT_SERVER_URL=
+"https://core-accounts.onrender.com";
+
+
+/* =========================================================
 ACCOUNT STATE
 ========================================================= */
 
@@ -633,7 +641,7 @@ let currentAccount=null;
 
 
 /* =========================================================
-ACCOUNT SESSION
+ACCOUNT SESSION CHECK
 ========================================================= */
 
 async function checkAccountSession(){
@@ -653,6 +661,7 @@ async function checkAccountSession(){
 
         const response=
             await fetch(
+                ACCOUNT_SERVER_URL +
                 "/api/me",
                 {
                     credentials:"include"
@@ -677,11 +686,6 @@ async function checkAccountSession(){
             data.success &&
             data.loggedIn
         ){
-
-            currentAccount={
-                username:data.username
-            };
-
 
             setLoggedIn(
                 data.username
@@ -871,19 +875,31 @@ function openAccount(){
 
 
 /* =========================================================
-OPEN FULL ACCOUNT SYSTEM
+OPEN CORE GAMES ACCOUNTS
 ========================================================= */
 
 function openFullAccount(){
 
     /*
-    Change this URL if your Core Games
-    Accounts page is hosted somewhere else.
+    Open the Core Games Accounts service
+    in a separate browser tab.
     */
 
     window.open(
-        "/",
+        ACCOUNT_SERVER_URL,
         "_blank"
+    );
+
+    /*
+    Check for a new login after a
+    short delay and continue checking
+    periodically while this launcher
+    tab remains open.
+    */
+
+    setTimeout(
+        checkAccountSession,
+        2000
     );
 
 }
@@ -899,6 +915,7 @@ async function logoutAccount(){
 
         const response=
             await fetch(
+                ACCOUNT_SERVER_URL +
                 "/api/logout",
                 {
                     method:"POST",
@@ -944,6 +961,16 @@ async function logoutAccount(){
     }
 
 }
+
+
+/* =========================================================
+PERIODIC ACCOUNT CHECK
+========================================================= */
+
+setInterval(
+    checkAccountSession,
+    5000
+);
 
 
 /* =========================================================
