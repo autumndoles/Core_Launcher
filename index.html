@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 
 <html lang="en">
@@ -342,6 +343,10 @@ main{
     margin-top:20px
 }
 
+#fileInput{
+    display:none
+}
+
 .notification{
     position:fixed;
     bottom:25px;
@@ -399,31 +404,26 @@ footer{
 id="allGamesButton"
 class="primary"
 onclick="showAllGames()"
-
 >
-
-🎮 All Games </button>
+🎮 All Games
+</button>
 
 <button
 id="favoritesButton"
 onclick="showFavorites()"
-
 >
-
-❤️ Favorites </button>
+❤️ Favorites
+</button>
 
 <button
 id="accountButton"
 class="account-button"
 onclick="openAccount()"
-
 >
-
 <span
 id="accountStatusDot"
 class="account-status-dot"
-
-> </span>
+></span>
 
 <span id="accountButtonText">
 👤 Core Account
@@ -450,7 +450,6 @@ class="search"
 type="text"
 placeholder="🔍 Search games..."
 oninput="renderGames()"
-
 >
 
 <button onclick="clearGames()">
@@ -499,6 +498,7 @@ Game Launcher • HTML Game Platform
 
 </div>
 
+
 <!-- ACCOUNT MODAL -->
 
 <div
@@ -535,6 +535,7 @@ Close
 </div>
 
 </div>
+
 
 <!-- INSTRUCTIONS MODAL -->
 
@@ -604,10 +605,12 @@ Close
 
 </div>
 
+
 <div
 id="notification"
 class="notification"
 ></div>
+
 
 <script>
 
@@ -626,10 +629,10 @@ const FAVORITES_STORAGE_KEY=
 
 
 /* =========================================================
-CORE GAMES ACCOUNT SERVER
+CORE GAMES ACCOUNT CONFIGURATION
 ========================================================= */
 
-const ACCOUNT_SERVER_URL=
+const CORE_ACCOUNTS_URL =
 "https://core-accounts.onrender.com";
 
 
@@ -641,30 +644,21 @@ let currentAccount=null;
 
 
 /* =========================================================
-ACCOUNT SESSION CHECK
+ACCOUNT SESSION
 ========================================================= */
 
 async function checkAccountSession(){
-
-    const dot=
-        document.getElementById(
-            "accountStatusDot"
-        );
-
-    const buttonText=
-        document.getElementById(
-            "accountButtonText"
-        );
-
 
     try{
 
         const response=
             await fetch(
-                ACCOUNT_SERVER_URL +
+                CORE_ACCOUNTS_URL +
                 "/api/me",
                 {
-                    credentials:"include"
+                    method:"GET",
+                    credentials:"include",
+                    cache:"no-store"
                 }
             );
 
@@ -875,31 +869,14 @@ function openAccount(){
 
 
 /* =========================================================
-OPEN CORE GAMES ACCOUNTS
+OPEN FULL ACCOUNT SYSTEM
 ========================================================= */
 
 function openFullAccount(){
 
-    /*
-    Open the Core Games Accounts service
-    in a separate browser tab.
-    */
-
     window.open(
-        ACCOUNT_SERVER_URL,
+        CORE_ACCOUNTS_URL,
         "_blank"
-    );
-
-    /*
-    Check for a new login after a
-    short delay and continue checking
-    periodically while this launcher
-    tab remains open.
-    */
-
-    setTimeout(
-        checkAccountSession,
-        2000
     );
 
 }
@@ -915,7 +892,7 @@ async function logoutAccount(){
 
         const response=
             await fetch(
-                ACCOUNT_SERVER_URL +
+                CORE_ACCOUNTS_URL +
                 "/api/logout",
                 {
                     method:"POST",
@@ -964,12 +941,24 @@ async function logoutAccount(){
 
 
 /* =========================================================
-PERIODIC ACCOUNT CHECK
+AUTOMATIC ACCOUNT SESSION CHECK
 ========================================================= */
+
+/*
+Checks the Core Games account every 3 seconds.
+
+This means:
+
+1. Launcher is open.
+2. User clicks Log In.
+3. Account page opens in a new tab.
+4. User logs in.
+5. Launcher automatically detects the account.
+*/
 
 setInterval(
     checkAccountSession,
-    5000
+    3000
 );
 
 
